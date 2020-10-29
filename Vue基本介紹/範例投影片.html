@@ -1,0 +1,495 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+	<link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/white.css">
+	<style type="text/css">
+	.reveal pre code {
+		background-color:#272727;
+		max-width:950px;
+		height:370px;
+	}
+	
+	section {
+		width:9000px;
+	}
+	</style>
+	
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	</head>
+	
+	<body style="background-color: black; color: red">
+		<div class="reveal">
+			<div class="slides" style="color:white">
+				<section>
+					<h1 class="animate__animated animate__slow animate__bounce animate__infinite" style="color:white">Vue框架基本概念</h1>
+				</section>
+				
+				<section>
+					<ul>
+					<li>Vue實例</li>
+						<pre><code>
+//HTML
+&lt;div id="example"&gt;
+	&lt;p>vm.a的值:{{ a }}&lt;/p&gt;
+	
+&lt;/div&gt;
+//JS
+var data = { a: 1 }
+// The object is added to a Vue instance
+//此時變數data會和vue實例裡的資料綁定
+var vm = new Vue({
+	el: '#example',
+	data: data
+})
+
+vm.a == data.a // => true
+vm.a = 2
+data.a // => 2
+
+data.a = 3
+vm.a // => 3
+						</code></pre>
+					</ul>
+					<div id="example">
+						<p>vm.a的值:{{ a }}</p>			
+					</div>
+				</section>
+				
+				<section>
+					<ul>
+						<li>
+							Vue實例被創建時就存在data中的變數才會是響應式的
+						</li>
+						<pre><code>
+var data = { a: 1 }
+
+var vm = new Vue({
+	el: '#example',
+	data: data
+})
+data.b=2
+console.log(vm.b) =>undefined
+						</pre></code>
+					</ul>
+					官方建議:非立即使用的都先給空值或false
+				</section>
+				
+				<section>
+					<ul>
+						<li>object.freeze()防止現有屬性被修改</li>
+					</ul>
+					<pre><code>
+//HTML
+&lt;div id="app">
+  &lt;p>{{ foo }}&lt;/p>
+  &lt;button v-on:click="foo = 'baz'">Change it&lt;/button>
+&lt;/div>
+//JS					
+var obj = {
+  foo: 'bar'
+}
+
+Object.freeze(obj)
+
+new Vue({
+  el: '#app',
+  data: obj
+})
+					</code></pre>
+					<div id="apps">
+						<p>{{ foo }}</p>
+						<button v-on:click="foo = 'baz'">Change it</button>
+					</div>
+				</section>
+
+				<section>
+					<ul>
+						<li>
+							DOM物件與JS變數綁定
+						</li>
+						
+						<pre><code>
+//html
+&lt;div id="app"&gt;
+	{{ message }}
+&lt;/div&gt;
+//JS
+var app = new Vue({
+ el: '#app',
+ data: {
+  message: 'Hello Vue!'
+ }
+})
+						</code>
+						</pre>
+						<div id ="app" style="font-size:25px">
+						嘗試一下，按下F12在console輸入app.message1="隨你輸入"
+						，結果:{{message1}}
+						</div>
+					</ul>
+				
+				</section>
+				
+				<section>
+					<ul>
+						<li>
+							v-bind使用(與html屬性繫結)
+						</li>
+						<li>
+							v-開頭指令為vue指令，下方範例為與span標籤的title屬性綁定
+						</li>
+
+					
+					</ul>
+					<pre><code style="width:950px">
+//HTML
+&lt;div id="app-2"&gt;
+	&lt;span v-bind:title="message"&gt;
+		停幾秒看動態訊息！
+	&lt;/span&gt;
+&lt;/div&gt;
+//JS
+var app2 = new Vue({
+	el: '#app-2',
+	data: {
+		message: '页面載入於 ' + new Date().toLocaleString()
+	}
+})
+					</code>
+					</pre>					
+					<div id="app-2" style="font-size:25px">
+						<!--title與變數綁定-->
+						<span v-bind:title="message">
+							滑鼠停在這一下
+						</span>
+					</div>
+			
+				</section>
+				
+				<section>
+					<ul>
+						<li>
+							v-if使用(管控標籤狀態)
+						</li>
+						<li>
+							下方範例在app3.seen為true時才會顯示，否則連html標籤都沒有
+						</li>
+						<pre><code>
+//HTML
+&lt;div id="app-3"&gt;
+	&lt;p v-if="seen">现在你看到我了&lt;/p&gt;
+&lt;/div&gt;
+//JS
+var app3 = new Vue({
+	el: '#app-3',
+	data: {
+		seen: true
+	}
+})
+看到這在console輸入 app3.seen = true
+						</code>
+						</pre>
+					</ul>
+					<div id="app-3">
+						<p v-if="seen">现在你看到我了</p>
+					</div>
+				</section>
+				
+				<section>
+					<ul>
+						<li>
+							v-for使用(array的元素以列表呈現)
+						</li>
+						<pre><code>
+/HTML
+&lt;div id="app-4"&gt;
+	&lt;ol&gt;
+		&lt;li v-for="todo in todos"&gt;
+		{{ todo.text }}
+		&lt;/li&gt;
+	&lt;/ol&gt;
+&lt;/div&gt;
+/JS
+var app4 = new Vue({
+	el: '#app-4',
+	data: {
+		todos: [
+		{ text: '學 JavaScript' },
+		{ text: '學 Vue' },
+		{ text: 'Build something awesome' }
+		]
+	}
+})
+輸入app4.todos[0].text="123"
+
+						</code></pre>
+					</ul>
+					<div id="app-4">
+						<ol>
+							<!--v-for將array的元素以列表呈現-->
+							<li v-for="todo in todos">
+							{{ todo.text }}
+							</li>
+						</ol>
+					</div>	
+				</section>
+				
+				<section>
+					<ul>
+						<li>
+							v-on事件監聽(搭配method使用函式更改內容)
+						</li>
+						<pre><code>
+/html
+&lt;div id="app-5"&gt;
+	&lt;p>{{ message }}&lt;/p&gt;
+	&lt;button v-on:click="reverseMessage">Reverse Message&lt;/button&gt;
+&lt;/div&gt;			
+/JS
+var app5 = new Vue({
+	el: '#app-5',
+	data: {
+		message: 'Hello Vue.js!'
+	},
+	methods: {
+		reverseMessage: function () {
+		this.message = this.message.split('').reverse().join('')
+	}
+}
+})			
+						</code></pre>
+					</ul>
+					<div id="app-5">
+						<p>{{ message }}</p>
+						<!--用v-on:click將點擊事件與vue變數綁定-->
+						<button v-on:click="reverseMessage">Reverse Message</button>
+					</div>
+				</section>
+				
+				<section>
+					<ul>
+						<li>
+							v-model(變數與物件雙向綁定)
+						</li>
+						<pre><code>
+/HTML
+&lt;div id="app-6"&gt;
+	&lt;p&gt;{{ message }}&lt;/p&gt;
+	<!--v-model實現雙向綁定(更改input的值，app6.message的值也會跟著改動)-->
+	&lt;input v-model="message"&gt;
+&lt;/div&gt;
+/JS
+var app6 = new Vue({
+	el: '#app-6',
+	data: {
+		message: 'Hello Vue!'
+	}
+})
+						</code></pre>
+					</ul>
+					<div id="app-6">
+						<p>{{ message }}</p>
+						<!--v-model實現雙向綁定(更改input的值，app6.message的值也會跟著改動)-->
+						<input v-model="message">
+					</div>
+				</section>
+				
+				<section>
+					<ul>
+						<li>
+							組件化應用(自製html標籤)
+						</li>
+						<pre><code>
+/HTML
+&lt;div id="app-7"&gt;
+	&lt;ol&gt;
+		&lt;todo-item
+			v-for="item in groceryList"
+			v-bind:todo="item"
+			v-bind:key="item.id"
+		&gt;&lt;/todo-item&gt;
+	&lt;/ol&gt;
+&lt;/div&gt;
+/JS
+Vue.component('todo-item', {
+	//設定組件屬性
+	props: ['todo'],
+	//模板設定
+	template: '&lt;li&gt;{{ todo.text }}&lt;/li&gt;'
+})
+
+var app7 = new Vue({
+	el: '#app-7',
+	data: {
+		groceryList: [
+			{ id: 0, text: 'Vegetables' },
+			{ id: 1, text: 'Cheese' },
+			{ id: 2, text: 'Whatever else humans are supposed to eat' }
+		]
+	}
+})
+						</code></pre>
+					</ul>
+					<div id="app-7">
+						<ol>
+						<!--
+						Now we provide each todo-item with the todo object
+						it's representing, so that its content can be dynamic.
+						We also need to provide each component with a "key",
+						which will be explained later.
+						-->
+							<todo-item
+								v-for="item in groceryList"
+								v-bind:todo="item"
+								v-bind:key="item.id"
+							></todo-item>
+						</ol>
+					</div>
+				</section>
+				
+				<section>
+					<h1 style="color:white;">懶人包</h1>
+					<ul>
+						<li>
+							任何要執行雙向綁定或VUE特性的變數或物件都要包在VUE實例內,且只在相應區塊
+						</li>
+						<li>
+							基本指令:
+							<li>v-bind:綁定標籤屬性(html或自製)</li>
+							<li>v-if:標籤狀態判斷</li>
+							<li>v-for:遍歷對應物件</li>
+							<li>v-on:事件監聽</li>
+							<li>v-model:變數與html內容雙向綁定</li>
+						</li>
+					</ul>
+				</section>
+				
+				<section>
+					<ul>
+						<li>
+							Vue實例內容:
+							<li>el:該實例作用區塊，與特定id作用域綁定</li>
+							<li>data:作用區塊內的響應式參數</li>
+							<li>method:作用區塊內的可使用函式，可搭配v-on一起服用</li>
+						</li>
+						
+					<ul>
+				</section>
+				
+				<section>
+					<h3 style="color:white">參考資料</h3><br><br>
+					<a vertical-align-align:center href="https://vuejs.org/v2/guide/"><img  width="70" src="https://spng.pngfind.com/pngs/s/150-1507248_image-library-stock-file-vue-js-logo-wikimedia.png"><span style="vertical-align:30px">
+					Vue官網
+					</a><br>
+					
+					
+				</section>
+			
+			</div>
+		</div>
+		
+		<script src="dist/reveal.js"></script>
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+		<script>
+		
+			var data = { a: 1 }
+
+			// The object is added to a Vue instance
+			//此時變數data會和vue實例裡的資料雙向綁定
+			var vm = new Vue({
+				el: '#example',
+				data: data
+			})
+		
+			var app = new Vue({
+				el: '#app',
+				data: {
+					message1: ''
+				}
+			});
+			
+			var obj = {
+				foo: 'bar'
+			}
+				
+			Object.freeze(obj)
+				
+			new Vue({
+				el: '#apps',
+				data: obj
+			})
+			
+			var app2 = new Vue({
+				el: '#app-2',
+				data: {
+					message: '页面載入於 ' + new Date().toLocaleString()
+				}
+			})
+			
+			var app3 = new Vue({
+				el: '#app-3',
+				data: {
+					seen: false
+				}
+			})
+			
+			var app4 = new Vue({
+				el: '#app-4',
+				data: {
+					todos: [
+					{ text: '學 JavaScript' },
+					{ text: '學 Vue' },
+					{ text: 'Build something awesome' }
+					]
+				}
+			})
+			
+			var app5 = new Vue({
+				el: '#app-5',
+				data: {
+					message: 'Hello Vue.js!'
+				},
+				methods: {
+					reverseMessage: function () {
+					this.message = this.message.split('').reverse().join('')
+				}
+			}
+			})
+			
+			var app6 = new Vue({
+				el: '#app-6',
+				data: {
+					message: 'Hello Vue!'
+				}
+			})
+			
+			Vue.component('todo-item', {
+				// The todo-item component now accepts a
+				// "prop", which is like a custom attribute.
+				// This prop is called todo.
+				props: ['todo'],
+				//template: '<li>{{ todo.text + todo.id}}</li>'
+				template: '<li>{{ todo.text}}</li>'
+			})
+
+			var app7 = new Vue({
+				el: '#app-7',
+				data: {
+					groceryList: [
+						{ id: 1, text: 'Vegetables' },
+						{ id: 0, text: 'Cheese' },
+						{ id: 2, text: 'Whatever else humans are supposed to eat' }
+					]
+				}
+			})
+			
+			Reveal.initialize();
+		</script>
+		
+	</body>
+</html>
