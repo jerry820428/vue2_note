@@ -1,0 +1,605 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+	<link rel="stylesheet" href="dist/reveal.css">
+    <link rel="stylesheet" href="dist/theme/white.css">
+	<style type="text/css">
+	.reveal pre code {
+		background-color:#272727;
+		max-width:950px;
+		height:330px;
+	}
+	
+	section {
+		width:9000px;
+	}
+	
+	p {
+		font-size:24px;
+	}
+	</style>
+	
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js"></script>
+	</head>
+	
+	<body style="background-color: black; color: red">
+		<div class="reveal">
+			<div class="slides" style="color:white" >
+				<section>
+					<h1 style="color:white">模板語法及監聽</h1>
+				</section>
+			
+				<section>
+					<ul>
+					<li>插值</li>
+						<pre><code>
+//HTML
+&lt;span&gt;Message: {{ msg }}&lt;/span&gt;&lt;br&gt;
+&lt;span v-once&gt;不會更改的內容: {{ msg }}&lt;/span&gt;
+&lt;button v-on:click="msg='Hell World'" &gt; 改變msg內容&lt;/button&gt;
+//JS
+data:{msg:'Hello Vue'}
+						</code></pre>
+					</ul>
+						<div id="app">
+							<span>文字: {{ msg }}</span><br>
+							<span v-once>不動文字: {{ msg }}</span>
+							<button v-on:click="msg='Hell World'">改變文字內容</button>
+
+						</div>
+				</section>
+				
+				<section>
+					<ul>
+						<li>原始Html</li>
+						<pre><code>
+//HTML
+&lt;p&gt;純文本: {{ rawHtml }}&lt;/p&gt;
+&lt;p&gt;使用Html代碼: &lt;span style="color:red" v-html="rawHtml"&gt;&lt;/span&gt;&lt;/p&gt;
+//JS
+data: {rawHtml:'html'}
+*請不要將不被信任的內容作html插值
+v-html的內容是會被插入標籤或腳本的
+&lt;a href="https://www.google.com" onclick="alert('出大事了')">123&lt;/a>
+						</code></pre>
+					</ul>
+					<div id="app-1">
+					<p>純文本: {{ rawHtml }}</p>
+					<p>使用html代碼: <span style="color:red" v-html="rawHtml"></span></p>
+					<input v-model="testxss">
+					<p>會被插入危險代碼嗎?: <span style="color:red" v-html="testxss"></span></p>
+					</div>
+				</section>
+				
+				<section>
+					<ul>
+						<li>屬性插值</li>
+						<pre><code>
+//HTML
+&lt;button v-bind:disabled="isButtonDisabled">Button&lt;/button>
+&lt;button v-on:click="isButtonDisabled=false">左邊按鈕開啟&lt;/button>
+//JS
+data:{isButtonDisabled:true,}
+
+{{}}的方式無法套用在html屬性，需使用v-bind
+						</code></pre>
+						<!--單純的變數值不能用在html屬性中，要使用v-bind-->
+						<div id="app-2">
+						<button v-bind:disabled="isButtonDisabled">Button</button>
+						<button v-on:click="isButtonDisabled=false">左邊按鈕開啟</button>
+						</div>
+					</ul>
+				</section>
+				
+				<section>
+					<ul>
+						<li>套用javascript表達式</li>
+						<li>{{}}除了顯示vue參數外，也支援javascript表達式</li>
+						<pre><code>
+//Html 可使用
+&lt;div v-bind:id="'list-' + id">123&lt;/div>
+請無視下方雙引號..
+&#34;&#123;&#34;&#123;ok ? 'YES' : 'NO' }}
+&#34;&#123;&#34;&#123; message.split('').reverse().join('') &#125;&#125;&#34;
+//Html 不可使用
+&#34;&#123;&#34;&#123;var a = 1&#125;&#125; (非表達式)
+&#123;&#34;&#123;if (ok) { return message } &#125;&#34;&#125; (也無效，用?代替)
+						</code></pre>
+					</ul>
+				</section>
+				
+				<section>
+					<ul>
+						<li>動態參數</li>
+						<pre><code>
+//HTML
+&lt;a v-bind:href="url"> 超連結綁定 &lt;/a>
+&lt;a v-on:[eventname]="msg='你在看我'"> focus &lt;/a>
+//JS
+data:{url:'https://www.google.com' , eventname:"click"}
+//以下是無效的
+&lt;a v-bind:['foo' + bar]="value"> ... &lt;/a>(有引號)
+&lt;a v-bind:[someAttr]="value"> ... &lt;/a>(除非有someAttr這個屬性，否則無效)
+						</code></pre>
+					</ul>
+					<div id="app-3">
+					<a v-bind:href="url"> 超連結綁定 </a>
+					<a v-on:[eventname]="msg='你在看我'"> {{msg}} </a>
+					</div>
+				</section>
+			
+				<section>
+					<ul>
+						<li>修飾與縮寫</li>
+						<li>針對v-on及v-bind，Vue提供對應的縮寫</li>
+						<pre><code>
+//Html
+事件後加入.prevent 相當於event.preventDefault()
+&lt;a v-bind:href="url" v-on:click.prevent="alert"> 超連結不連結 &lt;/a>
+//縮寫
+&lt;a v-bind:href="url">...&lt;/a>  --> &lt;a :href="url">...&lt;/a>
+&lt;a v-on:click="doSomething">...&lt;/a>  --> &lt;a @click="doSomething">...&lt;/a>
+						</code></pre>
+					</ul>
+					<div id="app-4">
+					<a v-bind:href="url" v-on:click.prevent="alert"> 超連結不連結 </a>
+					</div>
+				</section>
+			
+				<section>
+					<h1 style="color:#ffffff">Computed Properties及監聽</h1>
+				</section>
+				
+				<section>
+					<ul>
+						<li>雖然{{}}支援js表達式，但複雜邏輯建議使用computed屬性</li>
+						<pre><code>
+//HTML(一樣請無視雙引號)
+&lt;div id="example">
+  &lt;p>Original message: "&#123;&#34;&#123;&#34; message &#125;&#34;&#125;&#34;lt;/p>
+  &lt;p>Computed reversed message: "&#123;&#34;&#123;&#34; reversedMessage &#125;&#34;&#125;&#34;"&lt;/p>
+&lt;/div>
+//JS
+data: &#123;message: 'Hello'},
+computed: &#123;
+	reversedMessage: function () &#123;
+		return this.message.split('').reverse().join('')
+	&#125;&#125;&#125;)
+						</pre></code>
+					</ul>
+					<div id="example">
+						<p>Original message: "{{ message }}"</p>
+						<p>Computed reversed message: "{{ reversedMessage }}"</p>
+					</div>
+				</section>
+				
+				<section>
+				
+					<ul>
+						<li>computed與method差異?</li>
+						<li>computed的方法會經過緩存，除非使用的值有更改，不然不會變</li>						
+						<pre><code>
+//HTML	
+&lt;p>現在時間computed: {{ now }}&lt;/p>
+&lt;p>現在時間method: {{ getNow() }}&lt;/p>
+//JS
+computed: {
+	now: function () {
+			return Date();
+		}
+},
+methods:{
+	getNow: function() {
+		return Date();
+	}
+},
+methods的方法只要其他有使用的變數有更動就會自動呼叫
+請在f12輸入 ie1.note='隨便'
+						</code></pre>
+					</ul>
+					
+					<div id = "example2">
+					<p>{{note}}</p>
+					<p>現在時間computed: {{ now }}</p>
+					<p>現在時間method: {{ getNow() }}</p>
+					</div>
+				</section>
+			
+				<section>			
+					<ul>
+						<li>computed與watch比較</li>						
+						<pre><code>
+//HTML
+&lt;div id="demo">{{ fullName }}&lt;/div>
+//JS (使用watch)
+var vm = new Vue({
+  el: '#demo',
+  data: {
+    firstName: 'Foo',
+    lastName: 'Bar',
+    fullName: 'Foo Bar'
+  },
+  watch: {
+    firstName: function (val) {
+      this.fullName = val + ' ' + this.lastName
+    },
+    lastName: function (val) {
+      this.fullName = this.firstName + ' ' + val
+    }
+  }
+})
+//使用computed (變數減少 計算量減少)
+var vm = new Vue({
+  el: '#demo',
+  data: {
+    firstName: 'Foo',
+    lastName: 'Bar'
+  },
+  computed: {
+    fullName: function () {
+      return this.firstName + ' ' + this.lastName
+    }
+  }
+})
+						</pre></code>
+					</ul>	
+					<div id="demo">{{ fullName }}</div>
+					<div id="demo2">{{ fullName }}</div>
+				</section>
+				
+				<section>
+					<ul>
+						<li>getter與setter</li>
+						<li>computed預設為getter，也可以設定setter</li>
+						<pre><code>
+//Html
+&lt;span>姓:{{firstName}}名:{{lastName}} 全名:{{fullName}}&lt;/span>	
+//JS
+data:{
+	firstName:'Mini',
+	lastName:'Diva'
+}
+computed: {
+  fullName: {
+    // getter
+    get: function () {
+      return this.firstName + ' ' + this.lastName
+    },
+    // setter
+    set: function (newValue) {
+      var names = newValue.split(' ')
+      this.firstName = names[0]
+      this.lastName = names[names.length - 1]
+    }
+  }
+}		
+//現在可以輸入forGetSet.fullName = '金城 武'			
+						</code></pre>
+					</ul>
+					<div id="forGetSet">
+						<span>姓:{{firstName}}  名:{{lastName}}  全名:{{fullName}}</span>
+					</div>
+				</section>
+				
+				<section>
+					<ul>
+						<li>監聽器</li>
+						<li>針對有時需要自訂監聽器時，watch提供較通用的解法</li>
+						<pre><code>
+//HTML						
+&lt;div id="watch-example">
+  &lt;p>
+    Ask a yes/no question:
+    &lt;input v-model="question">
+  &lt;/p>
+  &lt;p>{{ answer }}&lt;/p>
+&lt;/div>
+//JS
+&lt;script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js">&lt;/script>
+&lt;script src="https://cdn.jsdelivr.net/npm/lodash@4.13.1/lodash.min.js">&lt;/script>
+&lt;script>
+var watchExampleVM = new Vue({
+  el: '#watch-example',
+  data: {
+    question: '',
+    answer: 'I cannot give you an answer until you ask a question!'
+  },
+  watch: {
+    // whenever question changes, this function will run
+    question: function () {
+      this.answer = 'Waiting for you to stop typing...'
+      this.debouncedGetAnswer()
+    }
+  },
+  //實例被建立時執行
+  created: function () {
+    // _.debounce is a function provided by lodash to limit how
+    // often a particularly expensive operation can be run.
+    // In this case, we want to limit how often we access
+    // yesno.wtf/api, waiting until the user has completely
+    // finished typing before making the ajax request. To learn
+    // more about the _.debounce function (and its cousin
+    // _.throttle), visit: https://lodash.com/docs#debounce
+    this.debouncedGetAnswer = _.debounce(this.getAnswer, 500)
+  },
+  methods: {
+    getAnswer: function () {
+      if (this.question.indexOf('?') === -1) {
+        this.answer = 'Questions usually contain a question mark. ;-)'
+        return
+      }
+      this.answer = 'Thinking...'
+      var vm = this
+      axios.get('https://yesno.wtf/api')
+        .then(function (response) {
+          vm.answer = _.capitalize(response.data.answer)
+        })
+        .catch(function (error) {
+          vm.answer = 'Error! Could not reach the API. ' + error
+        })
+    }
+  }
+})
+&lt;/script>
+						</code></pre>
+					</ul>
+					<div id="watch-example">
+						<p>
+							Ask a yes/no question:
+							<input v-model="question">
+						</p>
+						<p>{{ answer }}</p>
+					</div>
+				</section>
+				
+			</div>
+		</div>
+		
+		<script src="dist/reveal.js"></script>
+		<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+		
+		<script>
+		
+			var app = new Vue({
+				el: '#app',
+				data: {
+					msg: 'Hello Vue!',
+					testxss:'not xss yet',
+					rawHtml:'html',
+					isButtonDisabled:true,
+					id:1,
+					url:'https://www.google.com',
+					eventname:"click"
+				},
+				methods:{
+					alert: function() {
+						alert('偏不轉連結')
+					}
+				}
+			})
+			
+			new Vue({
+				el: '#app-1',
+				data: {
+					rawHtml:'html',
+					testxss:'not xss yet'
+				}
+			})
+			
+			new Vue({
+				el: '#app-2',
+				data:{isButtonDisabled:true}
+			})
+			
+			new Vue({
+				el: '#app-3',
+				data:{
+					msg: 'Hello Vue!',
+					url:'https://www.google.com' , 
+					eventname:"click"
+				}
+			})
+			
+			new Vue({
+				el: '#app-4',
+				data:{url:'https://www.google.com' },
+				methods:{
+					alert: function() {
+						alert('偏不轉連結')
+					}
+				}
+			})
+			
+			var ie1 = new Vue({
+				el: '#example2',
+				data:{note:'請修改'},
+				computed: {
+					now: function () {
+							return Date();
+						}
+				},
+				methods:{
+					getNow: function() {
+						return Date();
+					}
+				},
+			})
+			
+			
+			
+			var vm = new Vue({
+				el: '#example',
+				data: {
+					message: 'Hello',
+					firstName: 'Foo',
+					lastName: 'Bar',
+					//fullName: 'Foo Bar'
+				},
+				
+				computed: {
+					// a computed getter
+					reversedMessage: function () {
+					// `this` points to the vm instance
+					//以這種方式取代將運算式直接寫在html標籤內 將message的內容反轉
+					return this.message.split('').reverse().join('')
+					},
+					
+					now: function () {
+						return Date()
+					},
+					
+					//用以下方是要把data的fullName註解掉或改名
+					//fullName: function () {
+					//	return this.firstName + ' ' + this.lastName
+					//}
+					
+					//computed預設只有get(唯讀)，也可以自訂set方法，如下
+					//此方法在更動fullName時，firstName或lastName會一起被修改
+					fullName: {
+						// getter
+						get() {
+							return this.firstName + ' ' + this.lastName;
+						},
+						// setter
+						set(newValue) {
+							var names = newValue.split(' ')
+							this.firstName = names[0]
+							this.lastName = names[names.length - 1]
+						}
+					}
+				},
+				//watch函式用來監看值或狀態的改變，例如下方就是當firstName或lastName改變時，fullName的對應修改
+				//但大量使用會造成效能負擔，因此建議用computed來達到相同目的
+				//watch: {
+				//	firstName: function (val) {
+				//		this.fullName = val + ' ' + this.lastName
+				//	},
+				//	lastName: function (val) {
+				//		this.fullName = this.firstName + ' ' + val
+				//	}
+				//}
+				
+			})
+			
+			var demo = new Vue({
+				el: '#demo',
+				data: {
+					firstName: 'Foo',
+					lastName: 'Bar',
+					fullName: 'Foo Bar'
+				},
+				watch: {
+					firstName: function (val) {
+						this.fullName = val + ' ' + this.lastName
+					},
+					lastName: function (val) {
+						this.fullName = this.firstName + ' ' + val
+					}
+				}
+			})
+			
+			var demo2 = new Vue({
+				el: '#demo2',
+				data: {
+					firstName: 'Foo',
+					lastName: 'Bar'
+				},
+				computed: {
+					fullName: function () {
+						return this.firstName + ' ' + this.lastName
+					}
+				}
+			})
+			
+			var forGetSet = new Vue ({
+				el:'#forGetSet',
+				data:{
+					firstName:'Mini',
+					lastName:'Diva'
+				},
+				computed: {
+					fullName: {
+						// getter
+						get: function () {
+							return this.firstName + ' ' + this.lastName
+						},
+						// setter
+						set: function (newValue) {
+							var names = newValue.split(' ')
+							this.firstName = names[0]
+							this.lastName = names[names.length - 1]
+						}
+					}
+				}
+			})
+			
+			var watchExampleVM = new Vue({
+				el: '#watch-example',
+				data: {
+					question: '',
+					answer: 'I cannot give you an answer until you ask a question!'
+				},
+				watch: {
+				// 如果 question值更改，則觸發下列函式
+					question: function () {
+						this.answer = 'Waiting for you to stop typing...'
+						this.debouncedGetAnswer()
+					}
+				},
+				//實例被建立時執行
+				created: function () {
+					//debounce為將函式設定為變化後一段時間內沒變化才執行
+					this.debouncedGetAnswer = debounce(this.getAnswer, 500)
+				},
+				methods: {
+					getAnswer: function () {
+						if (this.question.indexOf('?') === -1) {
+							this.answer = 'Questions usually contain a question mark. ;-)'
+							return
+						}
+						this.answer = 'Thinking...'
+						var vm = this
+						axios.get('https://yesno.wtf/api')
+							.then(function (response) {
+							vm.answer = capitalize(response.data.answer)
+							})
+							.catch(function (error) {
+							vm.answer = 'Error! Could not reach the API. ' + error
+							})
+					}
+				}
+			})
+			
+			//lodash的_.debounce
+			function debounce(func, wait) {
+				var timeout = null;
+				return function() {
+					var context = this, args = arguments;
+					clearTimeout(timeout);
+					
+					timeout = setTimeout(function() {
+						timeout = null;
+						func.apply(context, args);
+					}, wait);
+					//timeout如果用下方代替可能比較好讀懂
+					//timeout = setTimeout(context.getAnswer, wait);
+				};
+			}
+			//lodash的__.capitalize
+			function capitalize(str){
+				
+				var firstLetter = str[0].toUpperCase();
+				var otherLetter = str.substr(1,str.length-1).toLowerCase();
+				return firstLetter + otherLetter;
+			}
+		
+		Reveal.initialize();
+		</script>
+	</body>
+</html>

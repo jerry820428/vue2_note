@@ -1,0 +1,154 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+	
+	
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/axios@0.12.0/dist/axios.min.js"></script>
+	</head>
+	
+	<body>
+		<div id="example">
+			<p>Original message: "{{ message }}"</p>
+			<p>Computed reversed message: "{{ reversedMessage }}"</p>
+			<p>現在時間: "{{ now }}"</p>
+			<p>名稱: {{ fullName }}</p>
+		</div>
+		
+		<div id="watch-example">
+			<p>
+				Ask a yes/no question:
+				<input v-model="question">
+			</p>
+			<p>{{ answer }}</p>
+		</div>
+	
+	
+	
+	
+	
+	
+	
+		<script>
+			var vm = new Vue({
+				el: '#example',
+				data: {
+					message: 'Hello',
+					firstName: 'Foo',
+					lastName: 'Bar',
+					//fullName: 'Foo Bar'
+				},
+				computed: {
+					// a computed getter
+					reversedMessage: function () {
+					// `this` points to the vm instance
+					//以這種方式取代將運算式直接寫在html標籤內 將message的內容反轉
+					return this.message.split('').reverse().join('')
+					},
+					
+					now: function () {
+						return Date()
+					},
+					
+					//用以下方是要把data的fullName註解掉或改名
+					//fullName: function () {
+					//	return this.firstName + ' ' + this.lastName
+					//}
+					
+					//computed預設只有get(唯讀)，也可以自訂set方法，如下
+					//此方法在更動fullName時，firstName或lastName會一起被修改
+					fullName: {
+						// getter
+						get() {
+							return this.firstName + ' ' + this.lastName;
+						},
+						// setter
+						set(newValue) {
+							var names = newValue.split(' ')
+							this.firstName = names[0]
+							this.lastName = names[names.length - 1]
+						}
+					}
+				},
+				//watch函式用來監看值或狀態的改變，例如下方就是當firstName或lastName改變時，fullName的對應修改
+				//但大量使用會造成效能負擔，因此建議用computed來達到相同目的
+				//watch: {
+				//	firstName: function (val) {
+				//		this.fullName = val + ' ' + this.lastName
+				//	},
+				//	lastName: function (val) {
+				//		this.fullName = this.firstName + ' ' + val
+				//	}
+				//}
+				
+			})
+			
+			var watchExampleVM = new Vue({
+				el: '#watch-example',
+				data: {
+					question: '',
+					answer: 'I cannot give you an answer until you ask a question!'
+				},
+				watch: {
+				// 如果 question值更改，則觸發下列函式
+					question: function (newQuestion, oldQuestion) {
+						this.answer = 'Waiting for you to stop typing...'
+						this.debouncedGetAnswer()
+					}
+				},
+				created: function () {
+					this.debouncedGetAnswer = debounce(this.getAnswer, 500)
+				},
+				methods: {
+					getAnswer: function () {
+					if (this.question.indexOf('?') === -1) {
+						this.answer = 'Questions usually contain a question mark. ;-)'
+						return
+					}
+					this.answer = 'Thinking...'
+					var vm = this
+					axios.get('https://yesno.wtf/api')
+						.then(function (response) {
+						vm.answer = capitalize(response.data.answer)
+						})
+						.catch(function (error) {
+						vm.answer = 'Error! Could not reach the API. ' + error
+						})
+					}
+				}
+			})
+		
+		
+		
+		
+		
+			//lodash的_.debounce
+			function debounce(func, wait, immediate) {
+				var timeout;
+				return function() {
+					var context = this, args = arguments;
+					clearTimeout(timeout);
+					timeout = setTimeout(function() {
+						timeout = null;
+						if (!immediate) func.apply(context, args);
+					}, wait);
+					if (immediate && !timeout) func.apply(context, args);
+				};
+			}
+			//lodash的__.capitalize
+			function capitalize(str){
+				
+				var firstLetter = str[0].toUpperCase();
+				var otherLetter = str.substr(1,str.length-1).toLowerCase();
+				return firstLetter + otherLetter;
+			}
+	
+		</script>
+	
+	
+	</body>
+</html>

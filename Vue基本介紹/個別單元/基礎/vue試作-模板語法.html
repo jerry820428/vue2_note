@@ -1,0 +1,74 @@
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+	
+	
+	<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+	</head>
+	
+	<body>
+		<div id="app">
+			<span>Message: {{ msg }}</span><br>
+			<span v-once>This will never change: {{ msg }}</span>
+			<button v-on:click="msg='Hell World'">改變msg內容</button>
+			
+			<p>Using mustaches: {{ rawHtml }}</p>
+			<!--將顯示的內容加入html標記-->
+			<p>Using v-html directive: <span style="color:red" v-html="rawHtml"></span></p>
+			
+			<!--變數綁定狀態-->
+			<button v-bind:disabled="isButtonDisabled">Button</button>
+			<button v-on:click="isButtonDisabled=false">左邊按鈕開啟</button>
+			
+			<div v-bind:id="'list-' + id">123</div>
+			
+			<!--連結網址為變數url的值-->
+			<a v-bind:href="url"> 超連結綁定 </a>
+			<!--通式:當data內有變數eventName且值為'focus'時，下方就變為v-on:focus="doSomething"-->
+			<!--也要避免使用大寫，因為在判斷時會轉小寫，有大寫字元會找不到變數-->
+			<a v-on:[eventname]="msg='你在看我'"> focus </a>
+			
+			<!--.prevent相當於不執行預設功能，相當於javascript的event.prevent()-->
+			<!--<form v-on:submit.prevent="onSubmit"> 表單不傳送 </form>-->
+			<a v-bind:href="url" v-on:click.prevent="alert"> 超連結不連結 </a>
+			
+			<!--von事件可以用@符號來取代，例如@click='alert'-->
+		</div>
+		
+		
+	
+	
+	
+	
+	
+	
+	
+	
+		<script>
+			var app = new Vue({
+				el: '#app',
+				data: {
+					msg: 'Hello Vue!',
+					rawHtml:'html',
+					isButtonDisabled:true,
+					id:1,
+					url:'https://www.google.com',
+					eventname:"click"
+				},
+				methods:{
+					alert: function() {
+						alert('偏不轉連結');
+					}
+				}
+			})
+			
+			
+			
+		</script>
+	
+	</body>
+</html>
