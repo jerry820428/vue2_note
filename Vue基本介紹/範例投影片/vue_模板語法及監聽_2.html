@@ -105,11 +105,11 @@ data:{isButtonDisabled:true,}
 //Html 可使用
 &lt;div v-bind:id="'list-' + id">123&lt;/div>
 請無視下方雙引號..
-&#34;&#123;&#34;&#123;ok ? 'YES' : 'NO' }}
-&#34;&#123;&#34;&#123; message.split('').reverse().join('') &#125;&#125;&#34;
+&#123;&#123;ok ? 'YES' : 'NO' }}
+&#123;&#123; message.split('').reverse().join('') &#125;&#125;
 //Html 不可使用
-&#34;&#123;&#34;&#123;var a = 1&#125;&#125; (非表達式)
-&#123;&#34;&#123;if (ok) { return message } &#125;&#34;&#125; (也無效，用?代替)
+&#123;&#123;var a = 1&#125;&#125; (非表達式)
+&#123;&#123;if (ok) { return message } &#125;&#125; (也無效，用?代替)
 						</code></pre>
 					</ul>
 				</section>
@@ -162,8 +162,8 @@ data:{url:'https://www.google.com' , eventname:"click"}
 						<pre><code>
 //HTML(一樣請無視雙引號)
 &lt;div id="example">
-  &lt;p>Original message: "&#123;&#34;&#123;&#34; message &#125;&#34;&#125;&#34;lt;/p>
-  &lt;p>Computed reversed message: "&#123;&#34;&#123;&#34; reversedMessage &#125;&#34;&#125;&#34;"&lt;/p>
+  &lt;p>Original message: "&#123;&#123; message &#125;&#125;lt;/p>
+  &lt;p>Computed reversed message: "&#123;&#123; reversedMessage &#125;&#125;"&lt;/p>
 &lt;/div>
 //JS
 data: &#123;message: 'Hello'},
